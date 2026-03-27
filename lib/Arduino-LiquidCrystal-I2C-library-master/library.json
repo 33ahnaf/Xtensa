@@ -1,0 +1,6 @@
+{
+    "name": "Arduino-LiquidCrystal-I2C-library-master",
+    "version": "1.0.0",
+    "framworks": ["arduino"],
+    "platforms": ["espressif32"]
+}

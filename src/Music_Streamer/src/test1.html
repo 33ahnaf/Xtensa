@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --hot-pink: #ff2e97;
+            --soft-pink: #ffe4f1;
+            --dark-pink: #831843;
+            --hover-pink: #e61e82;
+        }
+
+        body {
+            background: #ff85c1; /* Saturated, cozy pink */
+            background: radial-gradient(circle, #ffaddb 0%, #ff85c1 100%);
+            color: var(--dark-pink);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 40px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(131, 24, 67, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        h2 { font-weight: 800; margin-bottom: 25px; }
+
+        /* The "Converter Style" Drop Zone */
+        .drop-zone {
+            border: 4px dashed var(--hot-pink);
+            background: var(--soft-pink);
+            border-radius: 25px;
+            padding: 50px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            background: #ffd1e8;
+            transform: scale(1.02);
+            border-style: solid;
+        }
+
+        .drop-zone p { font-weight: bold; margin: 0; pointer-events: none; }
+        
+        #file { display: none; } /* Hide the ugly default input */
+
+        button {
+            background: var(--hot-pink);
+            font-weight: bold;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 46, 151, 0.3);
+            width: 100%;
+        }
+
+        button:hover {
+            background: var(--hover-pink);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 46, 151, 0.4);
+        }
+
+        .progress {
+            width: 100%;
+            background: #eee;
+            border-radius: 20px;
+            margin-top: 25px;
+            height: 12px;
+            overflow: hidden;
+            display: none; /* Hidden until upload starts */
+        }
+
+        .bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff2e97, #ff85c1);
+            border-radius: 20px;
+            transition: width 0.3s;
+        }
+
+        #status { font-size: 14px; margin-top: 10px; font-weight: 600; }
+
+        .disconnect {
+            margin-top: 20px;
+            background: transparent;
+            color: #ff2e97;
+            border: 2px solid #ff2e97;
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .disconnect:hover { background: #ff2e97; color: white; }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Music Streamer</h2>
+        
+        <!-- Clickable Drop Zone -->
+        <div class="drop-zone" onclick="document.getElementById('file').click()" id="drop-zone">
+            <p id="file-name">✨ Drop your .WAV here or Click ✨</p>
+            <input type="file" id="file" accept=".wav" onchange="updateFileName()">
+        </div>
+
+        <button onclick="upload()">Upload Now</button>
+
+        <div class="progress" id="progress-container">
+            <div class="bar" id="bar"></div>
+        </div>
+        <p id="status"></p>
+
+        <button class="disconnect" onclick="disconnect()">Disconnect Stream</button>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file');
+
+        // Update name when file is picked
+        function updateFileName() {
+            const name = fileInput.files[0] ? fileInput.files[0].name : "✨ Drop your .WAV here or Click ✨";
+            document.getElementById('file-name').innerText = name;
+        }
+
+        // Drag and Drop Visuals
+        ['dragover', 'dragleave', 'drop'].forEach(evt => {
+            dropZone.addEventListener(evt, e => {
+                e.preventDefault();
+                if (evt === 'dragover') dropZone.classList.add('dragover');
+                else dropZone.classList.remove('dragover');
+            });
+        });
+
+        dropZone.addEventListener('drop', e => {
+            fileInput.files = e.dataTransfer.files;
+            updateFileName();
+        });
+
+        function upload() {
+            let file = fileInput.files[0];
+            if (!file) return;
+
+            document.getElementById("progress-container").style.display = "block";
+            let xhr = new XMLHttpRequest();
+            let formData = new FormData();
+            formData.append("data", file);
+
+            xhr.upload.onprogress = function(e){
+                if(e.lengthComputable){
+                    let p = (e.loaded / e.total) * 100;
+                    document.getElementById("bar").style.width = p + "%";
+                    document.getElementById("status").innerText = "Sending magic... " + p.toFixed(1) + "%";
+                }
+            };
+
+            xhr.onload = function(){
+                document.getElementById("status").innerText = "Upload complete! 🌸";
+                setTimeout(() => {
+                    document.getElementById("progress-container").style.display = "none";
+                    document.getElementById("bar").style.width = "0%";
+                }, 2000);
+            };
+
+            xhr.open("POST", "/upload", true);
+            xhr.send(formData);
+        }
+
+        function disconnect(){ fetch("/disconnect"); }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            margin-top: 60px
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 14px;
+            width: 320px;
+            margin: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .4)
+        }
+
+        button {
+            background: #22c55e;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer
+        }
+
+        .progress {
+            width: 100%;
+            background: #334155;
+            border-radius: 10px;
+            margin-top: 20px;
+            height: 18px
+        }
+
+        .bar {
+            height: 18px;
+            width: 0%;
+            background: #22c55e;
+            border-radius: 10px
+        }
+
+        .disconnect {
+            margin-top: 15px;
+            background: #ef4444
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Music Streamer Uploader</h2>
+        <input type="file" id="file" accept=".wav"><br><br>
+        <button onclick="upload()">Upload</button>
+
+        <div class="progress">
+            <div class="bar" id="bar"></div>
+        </div>
+        <p id="status"></p>
+
+        <button class="disconnect" onclick="disconnect()">Disconnect</button>
+    </div>
+
+    <script>
+
+        function upload() {
+            let file = document.getElementById("file").files[0];
+            if (!file) return;
+
+            let xhr = new XMLHttpRequest();
+            let formData = new FormData();
+            formData.append("data", file);
+
+            xhr.upload.onprogress = function(e){
+                if(e.lengthComputable){
+                    let p = (e.loaded / e.total) * 100;
+                    document.getElementById("bar").style.width = p + "%";
+                    document.getElementById("status").innerText = "Uploading " + p.toFixed(1) + "%";
+                }
+            };
+
+            xhr.onload = function(){
+                document.getElementById("status").innerText = "Upload complete";
+                document.getElementById("bar").style.width = "0%";
+            };
+
+            xhr.onerror = function(){
+                document.getElementById("status").innerText = "Upload failed";
+            };
+
+            xhr.open("POST", "/upload", true);
+            xhr.send(formData);
+        }
+
+        function disconnect(){
+            fetch("/disconnect");
+        }
+
+    </script>
+</body>
+
+</html> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- body {
+    background: #fdf2f8; /* Very light pink background */
+    color: #831843; /* Deep pink text */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    width: 450px;
+    box-shadow: 0 20px 40px rgba(219, 39, 119, 0.1);
+    border: 2px solid #fce7f3;
+}
+
+/* The "Drop Down" Section Style */
+.drop-zone {
+    border: 3px dashed #f472b6;
+    border-radius: 20px;
+    padding: 40px 20px;
+    margin-bottom: 20px;
+    background: #fff1f2;
+    transition: all 0.3s ease;
+}
+
+button {
+    background: #db2777; /* Hot Pink */
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    transition: transform 0.2s;
+}
+
+button:hover {
+    background: #be185d;
+    transform: translateY(-2px);
+} -->

