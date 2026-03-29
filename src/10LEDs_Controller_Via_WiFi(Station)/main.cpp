@@ -13,8 +13,8 @@
 #define L10 23
 
 int LED_PINs[10] = {L1, L2, L3, L4, L5, L6, L7, L8, L9, L10};
-const char *ssid = "REZAUL WIFI@SKIT";
-const char *password = "R1234567*";
+const char *ssid = "Hehe boii";
+const char *password = "ESPESP3232";
 
 NetworkServer server(80);
 
